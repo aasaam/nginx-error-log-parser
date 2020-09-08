@@ -1,0 +1,5 @@
+tmp/
+coverage.out
+nginx-error-log-parser
+nginx-error-log-parser*.tgz
+go.sum
