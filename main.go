@@ -36,9 +36,11 @@ func main() {
 
 				for entry := range t.Lines {
 					ngxParser, e := Parser(entry.Text)
+
 					if e != nil {
-						log.Fatal(e)
+						log.Println("Parse failed on: ", entry.Text)
 					}
+
 					json, _ := ParserJSON(ngxParser)
 					if _, err = f.Write(append(json, "\n"...)); err != nil {
 						log.Fatal(err)
