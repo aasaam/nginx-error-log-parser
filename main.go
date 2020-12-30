@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/hpcloud/tail"
+	"github.com/nxadm/tail"
 	"github.com/urfave/cli/v2"
 )
 

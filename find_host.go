@@ -1,6 +1,8 @@
 package main
 
-import "regexp"
+import (
+	"regexp"
+)
 
 var hostRegex, _ = regexp.Compile(`host[: ]+"(?P<host>[^"]+)"`)
 

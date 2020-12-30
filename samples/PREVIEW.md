@@ -344,51 +344,6 @@
 ---
 
 ```txt
-
-```
-
-```json
-```
-
----
-
-```txt
-2020/01/02 03:04:05 [info]
-```
-
-```json
-```
-
----
-
-```txt
-7#8: *851624
-```
-
-```json
-```
-
----
-
-```txt
-client closed connection while waiting for request, client: 127.0.0.1, server: 0.0.0.0:80
-```
-
-```json
-```
-
----
-
-```txt
-
-```
-
-```json
-```
-
----
-
-```txt
 2020/01/02 03:04:05 [info] 7#8: *851624 client closed connection while waiting for request, client: 127.0.0.1, server: 0.0.0.0:80
 ```
 

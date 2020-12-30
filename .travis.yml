@@ -7,12 +7,12 @@ before_install:
   - go get -v -u golang.org/x/tools/cmd/cover
   - go get -v -u github.com/mattn/goveralls
   - go get -v -u github.com/derekstavis/go-qs
-  - go get -v -u github.com/hpcloud/tail
-  - go get -v -u github.com/urfave/cli
+  - go get -v -u github.com/nxadm/tail
+  - go get -v -u github.com/urfave/cli/v2
   - go test -v -covermode=count -coverprofile=coverage.out
   - goveralls -ignore=main.go -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 script:
-  - GOOS=linux GOARCH=amd64 go build
+  - GOOS=linux GOARCH=amd64 go build -ldflags="-w -s"
   - tar -czf nginx-error-log-parser-linux-amd64.tgz nginx-error-log-parser
 
 before_deploy:
@@ -20,7 +20,7 @@ before_deploy:
   - git config --local user.email "info@aasaam.com"
   - export TRAVIS_TAG=$(date +'%Y%m%d%H%M%S')
   - git tag $TRAVIS_TAG
-  - GOOS=linux GOARCH=amd64 go build
+  - GOOS=linux GOARCH=amd64 go build -ldflags="-w -s"
   - tar -czf nginx-error-log-parser-linux-amd64.tgz nginx-error-log-parser
 
 deploy:

@@ -1,6 +1,8 @@
 package main
 
-import "regexp"
+import (
+	"regexp"
+)
 
 var clientIPRegex, _ = regexp.Compile(`client[: ]+(?P<IP>[0-9a-f\.:]{7,39})`)
 

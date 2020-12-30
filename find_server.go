@@ -1,6 +1,8 @@
 package main
 
-import "regexp"
+import (
+	"regexp"
+)
 
 var serverRegex, _ = regexp.Compile(`server[: ]+(?P<server>[^ ,]+)`)
 

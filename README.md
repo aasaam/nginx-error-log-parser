@@ -48,15 +48,17 @@ Preview of sample error log with structured JSON output are [here](./samples/PRE
 
 You can test benchmark using go test.
 
-Here sample of my benchmark
+Here sample of our benchmark
 
-```bash
+```txt
 $ go test -benchmem -run=^$ -bench BenchmarkParsing
-
 goos: linux
 goarch: amd64
-BenchmarkParsingRandomOne-8        91332             11248 ns/op            2178 B/op         20 allocs/op
-BenchmarkParsingRandomPick-8       27133             66287 ns/op            9066 B/op         87 allocs/op
+pkg: github.com/aasaam/nginx-error-log-parser
+BenchmarkParsingRandomOne-8        26314             43763 ns/op            5415 B/op         79 allocs/op
+BenchmarkParsingRandomPick-8       42358             41382 ns/op            3290 B/op         41 allocs/op
+PASS
+ok      github.com/aasaam/nginx-error-log-parser        3.660s
 ```
 
 ## Todo
