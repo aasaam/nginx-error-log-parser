@@ -1,0 +1,11 @@
+# Copyright (c) 2021 aasaam software development group
+version: '3'
+
+services:
+  nginx-error-log-parser:
+    container_name: nginx-error-log-parser
+    image: aasaam/nginx-error-log-parser
+    volumes:
+      - ./log:/log
+    command: command: tail --error-log /log/nginx.in.*.error.log --ndjson-log /log/nginx.errors.ndjson
+    restart: unless-stopped
