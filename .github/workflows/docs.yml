@@ -18,14 +18,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASS }}
-          repository: aasaam/whois-json
+          repository: aasaam/nginx-error-log-parser
 
       - name: push README to Quay.io
         uses: christian-korneck/update-container-description-action@v1
         env:
           DOCKER_APIKEY: ${{ secrets.QUAY_HUB_TOKEN }}
         with:
-          destination_container_repo: quay.io/aasaam/whois-json
+          destination_container_repo: quay.io/aasaam/nginx-error-log-parser
           provider: quay
           readme_file: "README.md"
 
