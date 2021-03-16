@@ -1,0 +1,35 @@
+# Copyright (c) 2021 aasaam software development group
+image: docker:stable
+
+services:
+  - docker:dind
+
+stages:
+  - build
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - docker login --username=$DOCKER_HUB_USER --password=$DOCKER_HUB_PASS
+  - docker login --username=$QUAY_HUB_USER --password=$QUAY_HUB_PASS quay.io
+  - docker login --username=$GITHUB_HUB_USER --password=$GITHUB_HUB_PASS docker.pkg.github.com
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build:
+  stage: build
+  script:
+    # build
+    - docker build -f Dockerfile -t aasaam/nginx-error-log-parser .
+    # push
+    - |
+      docker push aasaam/nginx-error-log-parser
+      docker image tag aasaam/nginx-error-log-parser quay.io/aasaam/nginx-error-log-parser
+      docker push quay.io/aasaam/nginx-error-log-parser
+      docker image tag aasaam/nginx-error-log-parser docker.pkg.github.com/aasaam/nginx-error-log-parser/nginx-error-log-parser
+      docker push docker.pkg.github.com/aasaam/nginx-error-log-parser/nginx-error-log-parser
+      docker image tag aasaam/nginx-error-log-parser $CI_REGISTRY/aasaam/nginx-error-log-parser:latest
+      docker push $CI_REGISTRY/aasaam/nginx-error-log-parser:latest
+    # remove image
+    - docker rmi aasaam/nginx-error-log-parser
+  coverage: '/TOTAL_COVERAGE_FOR_CI_F: \d+\.\d+/'

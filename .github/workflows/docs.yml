@@ -1,0 +1,49 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASS }}
+          repository: aasaam/whois-json
+
+      - name: push README to Quay.io
+        uses: christian-korneck/update-container-description-action@v1
+        env:
+          DOCKER_APIKEY: ${{ secrets.QUAY_HUB_TOKEN }}
+        with:
+          destination_container_repo: quay.io/aasaam/whois-json
+          provider: quay
+          readme_file: "README.md"
+
+      - name: Build GitHub Page
+        run: |
+          cd docs
+          rm -rf .gitignore
+          git init .
+          git config --global user.email "gh-page@github.com"
+          git config --global user.name "GitHub Action"
+          git add .
+          git commit -a -m "Documentation build on $(date)"
+          git branch -m gh-pages
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
+          directory: docs
+          branch: gh-pages

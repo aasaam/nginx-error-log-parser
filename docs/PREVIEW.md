@@ -1,4 +1,6 @@
-# Preview nginx error log parser
+# Preview
+
+This is sample of error log and parsed result
 
 ```txt
 2020/01/02 03:04:05 [error] 7#8: *851624 open() "/path/to/favicon.ico" failed (2: No such file or directory), client: 127.0.0.1, server: _, request: "GET /favicon.ico HTTP/1.1", host: "example.com", referrer: "https://abc.example.com/"
@@ -555,12 +557,12 @@
 ---
 
 ```txt
-2020/09/08 15:45:44 [error] 6#6: *1 failed to load external Lua file "/usr/local/openresty/lualib/access_normal.lua": cannot open /usr/local/openresty/lualib/access_normal.lua: Permission denied, client: 192.168.88.93, server: _, request: "GET / HTTP/1.1", host: "192.168.88.220"
+2020/12/31 15:34:35 [error] 6#6: *1 failed to load external Lua file "/usr/local/openresty/lualib/access_normal.lua": cannot open /usr/local/openresty/lualib/access_normal.lua: Permission denied, client: 192.168.88.93, server: _, request: "GET / HTTP/1.1", host: "192.168.88.220"
 ```
 
 ```json
 {
-  "time": "Tue, 08 Sep 2020 15:45:44 +0000",
+  "time": "Thu, 31 Dec 2020 15:34:35 +0000",
   "level": "error",
   "pid": 6,
   "tid": 6,
