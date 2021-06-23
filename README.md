@@ -3,7 +3,7 @@
     Nginx Error Log Parser
   </h1>
   <p>
-    Simple tool for parse and create structured json for Nginx error logs
+    Simple tool for parse and create structured JSON for Nginx error logs
   </p>
   <p>
     <a href="https://gitlab.com/aasaam/nginx-error-log-parser/-/pipelines"><img alt="CI Pipeline" src="https://gitlab.com/aasaam/nginx-error-log-parser/badges/master/pipeline.svg"></a>
