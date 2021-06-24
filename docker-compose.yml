@@ -2,10 +2,15 @@
 version: '3'
 
 services:
-  nginx-error-log-parser:
-    container_name: nginx-error-log-parser
+  nginx-accesslog-syslog:
+    container_name: nginx-accesslog-syslog
     image: aasaam/nginx-error-log-parser
-    volumes:
-      - ./log:/log
-    command: command: tail --error-log /log/nginx.in.*.error.log --ndjson-log /log/nginx.errors.ndjson
+    network_mode: host
+    command: accesslog-syslog-to-tcp --udp-listen 127.0.0.1:5172 --tcp-server 127.0.0.1:6172
+    restart: unless-stopped
+  nginx-errorlog-syslog:
+    container_name: nginx-errorlog-syslog
+    image: aasaam/nginx-error-log-parser
+    network_mode: host
+    command: errorlog-syslog-to-tcp --udp-listen 127.0.0.1:5171 --tcp-server 127.0.0.1:6171
     restart: unless-stopped

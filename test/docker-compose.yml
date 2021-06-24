@@ -1,0 +1,10 @@
+# Copyright (c) 2021 aasaam software development group
+version: '3'
+
+services:
+  nginx-test-server:
+    container_name: nginx-test-server
+    image: nginx:1
+    network_mode: host
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf

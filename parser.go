@@ -154,6 +154,12 @@ func Parser(message string) (entry NginxErrorEntry, e error) {
 	return NginxErrorEntry{}, e
 }
 
+// IsJSON just check is valid json or not
+func IsJSON(str string) bool {
+	var js json.RawMessage
+	return json.Unmarshal([]byte(str), &js) == nil
+}
+
 // ParserJSON json output from entry log
 func ParserJSON(entry NginxErrorEntry) ([]byte, error) {
 	return json.Marshal(entry)

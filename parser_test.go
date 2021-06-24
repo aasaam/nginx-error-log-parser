@@ -33,6 +33,15 @@ func TestParser(t *testing.T) {
 	}
 }
 
+func TestIsJSON(t *testing.T) {
+	if IsJSON("{\"foo\" :   true}") == false {
+		t.Error("JSON must be valid")
+	}
+	if IsJSON("{\"foo\": 11,}") == true {
+		t.Error("JSON must not be valid")
+	}
+}
+
 func TestPacket000(t *testing.T) {
 	message := `2020/01/02 03:04:05 [info] 7#8: *851624 `
 	message = message + `this is exception might be happened and
