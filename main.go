@@ -12,8 +12,7 @@ import (
 	"gopkg.in/mcuadros/go-syslog.v2"
 )
 
-var BuildTime = "development"
-
+// AccessLogSyslogToTCP Receive nginx access log from Syslog(UDP) and send to TCP Server
 func AccessLogSyslogToTCP(c *cli.Context) error {
 	channel := make(syslog.LogPartsChannel)
 	handler := syslog.NewChannelHandler(channel)
@@ -54,6 +53,7 @@ func AccessLogSyslogToTCP(c *cli.Context) error {
 	return nil
 }
 
+// ErrorLogSyslogToTCP Receive nginx error log from Syslog(UDP) and send to TCP Server
 func ErrorLogSyslogToTCP(c *cli.Context) error {
 	tcpServerAddress := c.String("tcp-server")
 
@@ -99,6 +99,7 @@ func ErrorLogSyslogToTCP(c *cli.Context) error {
 	return nil
 }
 
+// TailToNDJSON Tail nginx error log files and generate NDJSON file
 func TailToNDJSON(c *cli.Context) error {
 	// tail
 	t, err := tail.TailFile(c.String("error-log"), tail.Config{Follow: c.Bool("follow")})
@@ -131,6 +132,7 @@ func TailToNDJSON(c *cli.Context) error {
 	return nil
 }
 
+// TailToTCP Tail nginx log files and send to TCP server
 func TailToTCP(c *cli.Context) error {
 
 	// tail
@@ -166,6 +168,7 @@ func TailToTCP(c *cli.Context) error {
 	return nil
 }
 
+// Test entry from cli and output the json
 func TestLog(c *cli.Context) error {
 	ngxParser, e := Parser(c.String("log"))
 	if e != nil {
@@ -182,7 +185,7 @@ func TestLog(c *cli.Context) error {
 
 func main() {
 	app := cli.NewApp()
-	app.Usage = "parse nginx error log to structured JSON (" + BuildTime + ")"
+	app.Usage = "parse nginx error log to structured JSON"
 	app.EnableBashCompletion = true
 	app.Commands = []*cli.Command{
 		{
@@ -205,7 +208,7 @@ func main() {
 		},
 		{
 			Name:  "tail-to-tcp",
-			Usage: "tail nginx log files and send to TCP server",
+			Usage: "Tail nginx log files and send to TCP server",
 			Flags: []cli.Flag{
 				&cli.StringFlag{Name: "error-log", Required: true, Aliases: []string{"error"}, Usage: "Input nginx error log"},
 				&cli.StringFlag{Name: "tcp-server", Required: true, Aliases: []string{"tcp"}, Usage: "Target TCP server"},
