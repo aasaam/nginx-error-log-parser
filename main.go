@@ -168,7 +168,7 @@ func TailToTCP(c *cli.Context) error {
 	return nil
 }
 
-// Test entry from cli and output the json
+// TestLog Test entry from cli and output the json
 func TestLog(c *cli.Context) error {
 	ngxParser, e := Parser(c.String("log"))
 	if e != nil {
