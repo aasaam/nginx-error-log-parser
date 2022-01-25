@@ -4,7 +4,7 @@ import (
 	"regexp"
 )
 
-var requestRegex, _ = regexp.Compile(`request[: ]+"(?P<requestMethod>[A-Z]+) (?P<requestURI>.*) HTTP\/(?P<requestHTTPVersion>[0-9\.]+)"`)
+var requestRegex = regexp.MustCompile(`request[: ]+"(?P<requestMethod>[A-Z]+) (?P<requestURI>.*) HTTP\/(?P<requestHTTPVersion>[0-9\.]+)"`)
 
 func findRequest(entry *NginxErrorEntry) {
 	if ok := requestRegex.MatchString(entry.Message); ok {

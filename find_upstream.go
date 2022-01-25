@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-var upstreamRegex, _ = regexp.Compile(`upstream[: ]+"(?P<upstream>[^"]+)"`)
+var upstreamRegex = regexp.MustCompile(`upstream[: ]+"(?P<upstream>[^"]+)"`)
 
 func findUpstream(entry *NginxErrorEntry) {
 	if ok := upstreamRegex.MatchString(entry.Message); ok {

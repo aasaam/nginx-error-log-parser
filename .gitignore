@@ -1,5 +1,6 @@
-tmp/
-coverage.out
-nginx-error-log-parser
-nginx-error-log-parser*.tgz
+# Copyright (c) 2021 aasaam software development group
+coverage.*
 go.sum
+tmp/
+rest-captcha
+rest-captcha*

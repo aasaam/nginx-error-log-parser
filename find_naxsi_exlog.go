@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-var naxsiExLogRegex, _ = regexp.Compile(`NAXSI_EXLOG: (?P<naxsiExLog>[^ ]+),`)
+var naxsiExLogRegex = regexp.MustCompile(`NAXSI_EXLOG: (?P<naxsiExLog>[^ ]+),`)
 
 func findNaxsiExLog(entry *NginxErrorEntry) {
 	if ok := naxsiExLogRegex.MatchString(entry.Message); ok {

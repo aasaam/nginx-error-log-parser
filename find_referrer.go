@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-var referrerRegex, _ = regexp.Compile(`referrer[: ]+"(?P<referrer>[^"]+)"`)
+var referrerRegex = regexp.MustCompile(`referrer[: ]+"(?P<referrer>[^"]+)"`)
 
 func findReferrer(entry *NginxErrorEntry) {
 	if ok := referrerRegex.MatchString(entry.Message); ok {

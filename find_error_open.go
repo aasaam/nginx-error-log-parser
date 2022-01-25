@@ -4,7 +4,7 @@ import (
 	"regexp"
 )
 
-var errorOpenFailedRegex, _ = regexp.Compile(`open\(\) "(?P<open>[^"]+)" failed \(2: No such file or directory\)`)
+var errorOpenFailedRegex = regexp.MustCompile(`open\(\) "(?P<open>[^"]+)" failed \(2: No such file or directory\)`)
 
 func findErrorOpenFailed(entry *NginxErrorEntry) {
 	if ok := errorOpenFailedRegex.MatchString(entry.Message); ok {

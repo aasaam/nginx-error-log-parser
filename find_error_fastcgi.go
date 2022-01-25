@@ -4,7 +4,7 @@ import (
 	"regexp"
 )
 
-var errorFastCGIRegex, _ = regexp.Compile(`FastCGI sent in stderr: "(?P<fastCGI>[^"]+)"`)
+var errorFastCGIRegex = regexp.MustCompile(`FastCGI sent in stderr: "(?P<fastCGI>[^"]+)"`)
 
 func findErrorFastCGI(entry *NginxErrorEntry) {
 	if ok := errorFastCGIRegex.MatchString(entry.Message); ok {

@@ -4,7 +4,7 @@ import (
 	"regexp"
 )
 
-var hostRegex, _ = regexp.Compile(`host[: ]+"(?P<host>[^"]+)"`)
+var hostRegex = regexp.MustCompile(`host[: ]+"(?P<host>[^"]+)"`)
 
 func findHost(entry *NginxErrorEntry) {
 	if ok := hostRegex.MatchString(entry.Message); ok {

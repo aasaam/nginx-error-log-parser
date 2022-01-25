@@ -76,12 +76,12 @@ type NginxErrorEntry struct {
 	NaxsiExLogContent string `json:"naxsi_exlog_content"`
 }
 
-var entryRegex, _ = regexp.Compile(`^(?s)(?P<time>[0-9]+\/[0-9]+\/[0-9]+ [0-9]+:[0-9]+:[0-9]+) \[(?P<level>[a-z]+)\] (?P<pid>[0-9]+)#(?P<tid>[0-9]+): \*(?P<cid>[0-9]+)(.*)$`)
+var entryRegex = regexp.MustCompile(`^(?s)(?P<time>[0-9]+\/[0-9]+\/[0-9]+ [0-9]+:[0-9]+:[0-9]+) \[(?P<level>[a-z]+)\] (?P<pid>[0-9]+)#(?P<tid>[0-9]+): \*(?P<cid>[0-9]+)(.*)$`)
 
 var nginxErrorLogDateTimeLayout = "2006/01/02 15:04:05"
 
-var noneAlphaRegex, _ = regexp.Compile(`[^a-zA-Z]`)
-var oneSpaceRegex, _ = regexp.Compile(`[\s]+`)
+var noneAlphaRegex = regexp.MustCompile(`[^a-zA-Z]`)
+var oneSpaceRegex = regexp.MustCompile(`[\s]+`)
 
 func parserTime(timeString string) (unixtimestamp string, e error) {
 	t, err := time.Parse(nginxErrorLogDateTimeLayout, timeString)

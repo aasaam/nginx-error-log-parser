@@ -6,9 +6,9 @@ import (
 	"strconv"
 )
 
-var naxsiFMTRegex, _ = regexp.Compile(`NAXSI_FMT: (?P<naxsiFMT>[^ ]+),`)
+var naxsiFMTRegex = regexp.MustCompile(`NAXSI_FMT: (?P<naxsiFMT>[^ ]+),`)
 
-var naxsiFmtCScoreRegex, _ = regexp.Compile(`^cscore(?P<index>[0-9]+)$`)
+var naxsiFmtCScoreRegex = regexp.MustCompile(`^cscore(?P<index>[0-9]+)$`)
 
 func findNaxsiFmt(entry *NginxErrorEntry) {
 	if ok := naxsiFMTRegex.MatchString(entry.Message); ok {
