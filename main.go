@@ -6,8 +6,8 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 
-	"github.com/nxadm/tail"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/mcuadros/go-syslog.v2"
 )
@@ -18,17 +18,23 @@ func accessLogSyslogToTCP(c *cli.Context) error {
 
 	tcpServerAddress := c.String("tcp-server")
 
+retryConnect:
+
 	tcpAddr, err := net.ResolveTCPAddr("tcp", tcpServerAddress)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Cannot resolve tcp-server: %s, %s\n", tcpServerAddress, err.Error())
+		time.Sleep(time.Second * 3)
+		goto retryConnect
 	}
 
-	// server connection
 	connection, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Cannot dial tcp-server: %s, %s\n", tcpServerAddress, err.Error())
+		time.Sleep(time.Second * 3)
+		goto retryConnect
 	}
 	defer connection.Close()
+	log.Printf("connection successfully established: %s\n", tcpServerAddress)
 
 	server := syslog.NewServer()
 	server.SetFormat(syslog.RFC3164)
@@ -41,7 +47,11 @@ func accessLogSyslogToTCP(c *cli.Context) error {
 			if content, ok := logParts["content"]; ok {
 				json := fmt.Sprintf("%v", content)
 				if isJSON(json) {
-					connection.Write([]byte(strings.TrimSpace(json) + "\n"))
+					_, connectionErr := connection.Write([]byte(strings.TrimSpace(json) + "\n"))
+					if connectionErr != nil {
+						log.Printf("Connection lost: %s, %s\n", tcpServerAddress, connectionErr.Error())
+						os.Exit(1)
+					}
 				}
 			}
 		}
@@ -55,17 +65,23 @@ func accessLogSyslogToTCP(c *cli.Context) error {
 func errorLogSyslogToTCP(c *cli.Context) error {
 	tcpServerAddress := c.String("tcp-server")
 
+retryConnect:
+
 	tcpAddr, err := net.ResolveTCPAddr("tcp", tcpServerAddress)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Cannot resolve tcp-server: %s, %s\n", tcpServerAddress, err.Error())
+		time.Sleep(time.Second * 3)
+		goto retryConnect
 	}
 
-	// server connection
 	connection, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Cannot dial tcp-server: %s, %s\n", tcpServerAddress, err.Error())
+		time.Sleep(time.Second * 3)
+		goto retryConnect
 	}
 	defer connection.Close()
+	log.Printf("connection successfully established: %s\n", tcpServerAddress)
 
 	channel := make(syslog.LogPartsChannel)
 	handler := syslog.NewChannelHandler(channel)
@@ -81,11 +97,15 @@ func errorLogSyslogToTCP(c *cli.Context) error {
 				ngxParser, err := Parser(fmt.Sprintf("%v", content))
 
 				if err != nil {
-					log.Println("Parse failed on: ", content)
+					log.Printf("Parse failed on: %s\n", content)
 				} else {
 					json, err := parserJSON(ngxParser)
 					if err == nil {
-						connection.Write(append(json, '\n'))
+						_, connectionErr := connection.Write(append(json, '\n'))
+						if connectionErr != nil {
+							log.Printf("Connection lost: %s, %s\n", tcpServerAddress, connectionErr.Error())
+							os.Exit(1)
+						}
 					}
 				}
 			}
@@ -93,73 +113,6 @@ func errorLogSyslogToTCP(c *cli.Context) error {
 	}(channel)
 
 	server.Wait()
-
-	return nil
-}
-
-func tailToNDJSON(c *cli.Context) error {
-	// tail
-	t, err := tail.TailFile(c.String("error-log"), tail.Config{Follow: c.Bool("follow")})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// ndjson
-	f, err := os.OpenFile(c.String("ndjson-log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	for entry := range t.Lines {
-		ngxParser, err := Parser(entry.Text)
-
-		if err != nil {
-			log.Println("Parse failed on: ", entry.Text)
-		} else {
-			json, err := parserJSON(ngxParser)
-			if err == nil {
-				if _, err = f.Write(append(json, "\n"...)); err != nil {
-					log.Fatal(err)
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func tailToTCP(c *cli.Context) error {
-
-	// tail
-	t, _ := tail.TailFile(c.String("error-log"), tail.Config{Follow: c.Bool("follow")})
-
-	tcpServerAddress := c.String("tcp-server")
-
-	tcpAddr, err := net.ResolveTCPAddr("tcp", tcpServerAddress)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// server connection
-	connection, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer connection.Close()
-
-	for entry := range t.Lines {
-		ngxParser, err := Parser(entry.Text)
-
-		if err != nil {
-			log.Println("Parse failed on: ", entry.Text)
-		} else {
-			json, err := parserJSON(ngxParser)
-			if err == nil {
-				connection.Write(append(json, '\n'))
-			}
-		}
-	}
 
 	return nil
 }
@@ -184,42 +137,22 @@ func main() {
 	app.EnableBashCompletion = true
 	app.Commands = []*cli.Command{
 		{
-			Name:  "access-log-syslog",
-			Usage: "Receive nginx access log from Syslog(UDP) and send to TCP Server",
+			Name:  "access-log",
+			Usage: "Receive nginx access log(escape=json) from Syslog(UDP) and send to TCP Server",
 			Flags: []cli.Flag{
 				&cli.StringFlag{Value: "127.0.0.1:5141", Name: "udp-listen", Aliases: []string{"listen"}, Usage: "Listen syslog RFC3164"},
-				&cli.StringFlag{Value: "127.0.0.1:6171", Name: "tcp-server", Aliases: []string{"tcp"}, Usage: "Target TCP server"},
+				&cli.StringFlag{Value: "127.0.0.1:6141", Name: "tcp-server", Aliases: []string{"tcp"}, Usage: "Target TCP server"},
 			},
 			Action: accessLogSyslogToTCP,
 		},
 		{
-			Name:  "error-log-syslog",
+			Name:  "error-log",
 			Usage: "Receive nginx error log from Syslog(UDP) and send to TCP Server",
 			Flags: []cli.Flag{
 				&cli.StringFlag{Value: "127.0.0.1:5140", Name: "udp-listen", Aliases: []string{"listen"}, Usage: "Listen syslog RFC3164"},
-				&cli.StringFlag{Value: "127.0.0.1:6172", Name: "tcp-server", Aliases: []string{"tcp"}, Usage: "Target TCP server"},
+				&cli.StringFlag{Value: "127.0.0.1:6140", Name: "tcp-server", Aliases: []string{"tcp"}, Usage: "Target TCP server"},
 			},
 			Action: errorLogSyslogToTCP,
-		},
-		{
-			Name:  "tail-to-tcp",
-			Usage: "Tail nginx log files and send to TCP server",
-			Flags: []cli.Flag{
-				&cli.StringFlag{Name: "error-log", Required: true, Aliases: []string{"error"}, Usage: "Input nginx error log"},
-				&cli.StringFlag{Name: "tcp-server", Required: true, Aliases: []string{"tcp"}, Usage: "Target TCP server"},
-				&cli.BoolFlag{Name: "follow", Aliases: []string{"f"}, Value: false, Usage: "Follow the error log"},
-			},
-			Action: tailToTCP,
-		},
-		{
-			Name:  "tail-to-ndjson",
-			Usage: "Tail nginx error log files and generate NDJSON file",
-			Flags: []cli.Flag{
-				&cli.StringFlag{Name: "error-log", Required: true, Aliases: []string{"error"}, Usage: "Input nginx error log"},
-				&cli.StringFlag{Name: "ndjson-log", Required: true, Aliases: []string{"ndjson"}, Usage: "Output ndjson"},
-				&cli.BoolFlag{Name: "follow", Aliases: []string{"f"}, Value: false, Usage: "Follow the error log"},
-			},
-			Action: tailToNDJSON,
 		},
 		{
 			Name:  "test",

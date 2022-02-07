@@ -8,3 +8,10 @@ services:
     network_mode: host
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf
+  vector:
+    container_name: vector
+    image: timberio/vector:0.19.1-debian
+    network_mode: host
+    volumes:
+      - ./vector.toml:/etc/vector/vector.toml:ro
+      - /tmp/vector:/tmp
