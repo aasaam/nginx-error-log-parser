@@ -24,7 +24,7 @@ var entries = []string{
 
 func TestParser(t *testing.T) {
 	for _, entry := range entries {
-		ngxParser, e := Parser(entry)
+		ngxParser, e := parser(entry)
 		if e != nil {
 			t.Error(e)
 		}
@@ -47,7 +47,7 @@ func TestPacket000(t *testing.T) {
 	message = message + `this is exception might be happened and
 	could be multi line`
 
-	_, e := Parser(message)
+	_, e := parser(message)
 	if e != nil {
 		t.Error(e)
 	}
@@ -55,7 +55,7 @@ func TestPacket000(t *testing.T) {
 }
 
 func TestPacket001(t *testing.T) {
-	_, e := Parser("INVALID PACKET")
+	_, e := parser("INVALID PACKET")
 	if e == nil {
 		t.Error("Invalid packet must throw an error")
 	}
@@ -72,7 +72,7 @@ func BenchmarkParsingRandomOne(b *testing.B) {
 	rand.Seed(time.Now().Unix())
 	n := rand.Int() % len(entries)
 	for i := 0; i < b.N; i++ {
-		Parser(entries[n])
+		parser(entries[n])
 	}
 }
 
@@ -80,6 +80,6 @@ func BenchmarkParsingRandomPick(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		rand.Seed(time.Now().Unix())
 		n := rand.Int() % len(entries)
-		Parser(entries[n])
+		parser(entries[n])
 	}
 }

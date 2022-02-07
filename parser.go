@@ -99,7 +99,7 @@ func replaceMatched(message string, whole string) string {
 	return strings.Replace(message, whole, "", -1)
 }
 
-func Parser(message string) (entry nginxErrorEntry, e error) {
+func parser(message string) (entry nginxErrorEntry, e error) {
 	if isMatched := entryRegex.MatchString(message); isMatched {
 		entry = nginxErrorEntry{}
 		matched := entryRegex.FindStringSubmatch(message)

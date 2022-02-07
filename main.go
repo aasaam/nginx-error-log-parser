@@ -94,7 +94,7 @@ retryConnect:
 	go func(channel syslog.LogPartsChannel) {
 		for logParts := range channel {
 			if content, ok := logParts["content"]; ok {
-				ngxParser, err := Parser(fmt.Sprintf("%v", content))
+				ngxParser, err := parser(fmt.Sprintf("%v", content))
 
 				if err != nil {
 					log.Printf("Parse failed on: %s\n", content)
@@ -118,7 +118,7 @@ retryConnect:
 }
 
 func testLog(c *cli.Context) error {
-	ngxParser, e := Parser(c.String("log"))
+	ngxParser, e := parser(c.String("log"))
 	if e != nil {
 		log.Fatal(e)
 	}
