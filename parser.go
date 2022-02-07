@@ -11,8 +11,7 @@ import (
 	"time"
 )
 
-// NaxsiFmtItem include list of matched in naxsi fmt log
-type NaxsiFmtItem struct {
+type naxsiFmtItem struct {
 	Zone    string `json:"zone"`
 	ID      string `json:"id"`
 	VarName string `json:"var_name"`
@@ -20,8 +19,7 @@ type NaxsiFmtItem struct {
 	Score   string `json:"score"`
 }
 
-// NginxErrorEntry is nginx error log packet
-type NginxErrorEntry struct {
+type nginxErrorEntry struct {
 	// essential
 	Time    string `json:"time"`
 	Level   string `json:"level"`
@@ -64,7 +62,7 @@ type NginxErrorEntry struct {
 	NaxsiFmtBlock          bool           `json:"naxsi_fmt_block"`
 	NaxsiFmtTotalProcessed int            `json:"naxsi_fmt_total_processed"`
 	NaxsiFmtTotalBlocked   int            `json:"naxsi_fmt_total_blocked"`
-	NaxsiFmtItems          []NaxsiFmtItem `json:"naxsi_fmt_items"`
+	NaxsiFmtItems          []naxsiFmtItem `json:"naxsi_fmt_items"`
 
 	// naxsi exlog
 	NaxsiExLogIP      string `json:"naxsi_exlog_ip"`
@@ -101,10 +99,9 @@ func replaceMatched(message string, whole string) string {
 	return strings.Replace(message, whole, "", -1)
 }
 
-// Parser give single line nginx error log and parse it
-func Parser(message string) (entry NginxErrorEntry, e error) {
+func Parser(message string) (entry nginxErrorEntry, e error) {
 	if isMatched := entryRegex.MatchString(message); isMatched {
-		entry = NginxErrorEntry{}
+		entry = nginxErrorEntry{}
 		matched := entryRegex.FindStringSubmatch(message)
 
 		entry.Time, _ = parserTime(matched[1])
@@ -116,7 +113,7 @@ func Parser(message string) (entry NginxErrorEntry, e error) {
 		entry.Msg = entry.Message
 		entry.checkSumUseMsg = true
 
-		entry.NaxsiFmtItems = make([]NaxsiFmtItem, 0)
+		entry.NaxsiFmtItems = make([]naxsiFmtItem, 0)
 
 		// general
 		findClient(&entry)
@@ -150,17 +147,15 @@ func Parser(message string) (entry NginxErrorEntry, e error) {
 
 		return entry, nil
 	}
-	e = errors.New("Packet is not valid")
-	return NginxErrorEntry{}, e
+	e = errors.New("packet is not valid")
+	return nginxErrorEntry{}, e
 }
 
-// IsJSON just check is valid json or not
-func IsJSON(str string) bool {
+func isJSON(str string) bool {
 	var js json.RawMessage
 	return json.Unmarshal([]byte(str), &js) == nil
 }
 
-// ParserJSON json output from entry log
-func ParserJSON(entry NginxErrorEntry) ([]byte, error) {
+func parserJSON(entry nginxErrorEntry) ([]byte, error) {
 	return json.Marshal(entry)
 }

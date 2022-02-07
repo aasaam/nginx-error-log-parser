@@ -6,7 +6,7 @@ import (
 
 var serverRegex = regexp.MustCompile(`server[: ]+(?P<server>[^ ,]+)`)
 
-func findServer(entry *NginxErrorEntry) {
+func findServer(entry *nginxErrorEntry) {
 	if ok := serverRegex.MatchString(entry.Message); ok {
 		matched := serverRegex.FindStringSubmatch(entry.Message)
 		entry.Server = matched[1]

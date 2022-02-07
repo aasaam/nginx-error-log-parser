@@ -2,5 +2,5 @@
 coverage.*
 go.sum
 tmp/
-rest-captcha
-rest-captcha*
+nginx-error-log-parser
+nginx-error-log-parser*

@@ -6,7 +6,7 @@ import (
 
 var hostRegex = regexp.MustCompile(`host[: ]+"(?P<host>[^"]+)"`)
 
-func findHost(entry *NginxErrorEntry) {
+func findHost(entry *nginxErrorEntry) {
 	if ok := hostRegex.MatchString(entry.Message); ok {
 		matched := hostRegex.FindStringSubmatch(entry.Message)
 		entry.Host = matched[1]

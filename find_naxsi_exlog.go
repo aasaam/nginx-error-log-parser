@@ -7,7 +7,7 @@ import (
 
 var naxsiExLogRegex = regexp.MustCompile(`NAXSI_EXLOG: (?P<naxsiExLog>[^ ]+),`)
 
-func findNaxsiExLog(entry *NginxErrorEntry) {
+func findNaxsiExLog(entry *nginxErrorEntry) {
 	if ok := naxsiExLogRegex.MatchString(entry.Message); ok {
 		matched := naxsiExLogRegex.FindStringSubmatch(entry.Message)
 		entry.Msg = replaceMatched(entry.Msg, matched[0])

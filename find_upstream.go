@@ -7,7 +7,7 @@ import (
 
 var upstreamRegex = regexp.MustCompile(`upstream[: ]+"(?P<upstream>[^"]+)"`)
 
-func findUpstream(entry *NginxErrorEntry) {
+func findUpstream(entry *nginxErrorEntry) {
 	if ok := upstreamRegex.MatchString(entry.Message); ok {
 		matched := upstreamRegex.FindStringSubmatch(entry.Message)
 		entry.Upstream = matched[1]

@@ -6,7 +6,7 @@ import (
 
 var errorOpenFailedRegex = regexp.MustCompile(`open\(\) "(?P<open>[^"]+)" failed \(2: No such file or directory\)`)
 
-func findErrorOpenFailed(entry *NginxErrorEntry) {
+func findErrorOpenFailed(entry *nginxErrorEntry) {
 	if ok := errorOpenFailedRegex.MatchString(entry.Message); ok {
 		matched := errorOpenFailedRegex.FindStringSubmatch(entry.Message)
 		entry.ErrorType = "open_failed"

@@ -6,7 +6,7 @@ import (
 
 var errorFastCGIRegex = regexp.MustCompile(`FastCGI sent in stderr: "(?P<fastCGI>[^"]+)"`)
 
-func findErrorFastCGI(entry *NginxErrorEntry) {
+func findErrorFastCGI(entry *nginxErrorEntry) {
 	if ok := errorFastCGIRegex.MatchString(entry.Message); ok {
 		matched := errorFastCGIRegex.FindStringSubmatch(entry.Message)
 		entry.ErrorType = "fastcgi_error"

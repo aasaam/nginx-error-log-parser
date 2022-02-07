@@ -12,8 +12,7 @@ import (
 	"gopkg.in/mcuadros/go-syslog.v2"
 )
 
-// AccessLogSyslogToTCP Receive nginx access log from Syslog(UDP) and send to TCP Server
-func AccessLogSyslogToTCP(c *cli.Context) error {
+func accessLogSyslogToTCP(c *cli.Context) error {
 	channel := make(syslog.LogPartsChannel)
 	handler := syslog.NewChannelHandler(channel)
 
@@ -41,7 +40,7 @@ func AccessLogSyslogToTCP(c *cli.Context) error {
 		for logParts := range channel {
 			if content, ok := logParts["content"]; ok {
 				json := fmt.Sprintf("%v", content)
-				if IsJSON(json) {
+				if isJSON(json) {
 					connection.Write([]byte(strings.TrimSpace(json) + "\n"))
 				}
 			}
@@ -53,8 +52,7 @@ func AccessLogSyslogToTCP(c *cli.Context) error {
 	return nil
 }
 
-// ErrorLogSyslogToTCP Receive nginx error log from Syslog(UDP) and send to TCP Server
-func ErrorLogSyslogToTCP(c *cli.Context) error {
+func errorLogSyslogToTCP(c *cli.Context) error {
 	tcpServerAddress := c.String("tcp-server")
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp", tcpServerAddress)
@@ -85,7 +83,7 @@ func ErrorLogSyslogToTCP(c *cli.Context) error {
 				if err != nil {
 					log.Println("Parse failed on: ", content)
 				} else {
-					json, err := ParserJSON(ngxParser)
+					json, err := parserJSON(ngxParser)
 					if err == nil {
 						connection.Write(append(json, '\n'))
 					}
@@ -99,8 +97,7 @@ func ErrorLogSyslogToTCP(c *cli.Context) error {
 	return nil
 }
 
-// TailToNDJSON Tail nginx error log files and generate NDJSON file
-func TailToNDJSON(c *cli.Context) error {
+func tailToNDJSON(c *cli.Context) error {
 	// tail
 	t, err := tail.TailFile(c.String("error-log"), tail.Config{Follow: c.Bool("follow")})
 	if err != nil {
@@ -120,7 +117,7 @@ func TailToNDJSON(c *cli.Context) error {
 		if err != nil {
 			log.Println("Parse failed on: ", entry.Text)
 		} else {
-			json, err := ParserJSON(ngxParser)
+			json, err := parserJSON(ngxParser)
 			if err == nil {
 				if _, err = f.Write(append(json, "\n"...)); err != nil {
 					log.Fatal(err)
@@ -132,8 +129,7 @@ func TailToNDJSON(c *cli.Context) error {
 	return nil
 }
 
-// TailToTCP Tail nginx log files and send to TCP server
-func TailToTCP(c *cli.Context) error {
+func tailToTCP(c *cli.Context) error {
 
 	// tail
 	t, _ := tail.TailFile(c.String("error-log"), tail.Config{Follow: c.Bool("follow")})
@@ -158,7 +154,7 @@ func TailToTCP(c *cli.Context) error {
 		if err != nil {
 			log.Println("Parse failed on: ", entry.Text)
 		} else {
-			json, err := ParserJSON(ngxParser)
+			json, err := parserJSON(ngxParser)
 			if err == nil {
 				connection.Write(append(json, '\n'))
 			}
@@ -168,13 +164,12 @@ func TailToTCP(c *cli.Context) error {
 	return nil
 }
 
-// TestLog Test entry from cli and output the json
-func TestLog(c *cli.Context) error {
+func testLog(c *cli.Context) error {
 	ngxParser, e := Parser(c.String("log"))
 	if e != nil {
 		log.Fatal(e)
 	}
-	json, e := ParserJSON(ngxParser)
+	json, e := parserJSON(ngxParser)
 	if e == nil {
 		fmt.Println(string(json))
 	} else {
@@ -192,19 +187,19 @@ func main() {
 			Name:  "access-log-syslog",
 			Usage: "Receive nginx access log from Syslog(UDP) and send to TCP Server",
 			Flags: []cli.Flag{
-				&cli.StringFlag{Value: "127.0.0.1:5171", Name: "udp-listen", Aliases: []string{"listen"}, Usage: "Listen syslog RFC3164"},
+				&cli.StringFlag{Value: "127.0.0.1:5141", Name: "udp-listen", Aliases: []string{"listen"}, Usage: "Listen syslog RFC3164"},
 				&cli.StringFlag{Value: "127.0.0.1:6171", Name: "tcp-server", Aliases: []string{"tcp"}, Usage: "Target TCP server"},
 			},
-			Action: AccessLogSyslogToTCP,
+			Action: accessLogSyslogToTCP,
 		},
 		{
 			Name:  "error-log-syslog",
 			Usage: "Receive nginx error log from Syslog(UDP) and send to TCP Server",
 			Flags: []cli.Flag{
-				&cli.StringFlag{Value: "127.0.0.1:5172", Name: "udp-listen", Aliases: []string{"listen"}, Usage: "Listen syslog RFC3164"},
+				&cli.StringFlag{Value: "127.0.0.1:5140", Name: "udp-listen", Aliases: []string{"listen"}, Usage: "Listen syslog RFC3164"},
 				&cli.StringFlag{Value: "127.0.0.1:6172", Name: "tcp-server", Aliases: []string{"tcp"}, Usage: "Target TCP server"},
 			},
-			Action: ErrorLogSyslogToTCP,
+			Action: errorLogSyslogToTCP,
 		},
 		{
 			Name:  "tail-to-tcp",
@@ -214,7 +209,7 @@ func main() {
 				&cli.StringFlag{Name: "tcp-server", Required: true, Aliases: []string{"tcp"}, Usage: "Target TCP server"},
 				&cli.BoolFlag{Name: "follow", Aliases: []string{"f"}, Value: false, Usage: "Follow the error log"},
 			},
-			Action: TailToTCP,
+			Action: tailToTCP,
 		},
 		{
 			Name:  "tail-to-ndjson",
@@ -224,7 +219,7 @@ func main() {
 				&cli.StringFlag{Name: "ndjson-log", Required: true, Aliases: []string{"ndjson"}, Usage: "Output ndjson"},
 				&cli.BoolFlag{Name: "follow", Aliases: []string{"f"}, Value: false, Usage: "Follow the error log"},
 			},
-			Action: TailToNDJSON,
+			Action: tailToNDJSON,
 		},
 		{
 			Name:  "test",
@@ -232,7 +227,7 @@ func main() {
 			Flags: []cli.Flag{
 				&cli.StringFlag{Name: "log", Required: true, Aliases: []string{"error"}, Usage: "Input nginx error log"},
 			},
-			Action: TestLog,
+			Action: testLog,
 		},
 	}
 

@@ -6,7 +6,7 @@ import (
 
 var requestRegex = regexp.MustCompile(`request[: ]+"(?P<requestMethod>[A-Z]+) (?P<requestURI>.*) HTTP\/(?P<requestHTTPVersion>[0-9\.]+)"`)
 
-func findRequest(entry *NginxErrorEntry) {
+func findRequest(entry *nginxErrorEntry) {
 	if ok := requestRegex.MatchString(entry.Message); ok {
 		matched := requestRegex.FindStringSubmatch(entry.Message)
 		entry.RequestMethod = matched[1]

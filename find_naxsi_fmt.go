@@ -10,7 +10,7 @@ var naxsiFMTRegex = regexp.MustCompile(`NAXSI_FMT: (?P<naxsiFMT>[^ ]+),`)
 
 var naxsiFmtCScoreRegex = regexp.MustCompile(`^cscore(?P<index>[0-9]+)$`)
 
-func findNaxsiFmt(entry *NginxErrorEntry) {
+func findNaxsiFmt(entry *nginxErrorEntry) {
 	if ok := naxsiFMTRegex.MatchString(entry.Message); ok {
 		matched := naxsiFMTRegex.FindStringSubmatch(entry.Message)
 		entry.Msg = replaceMatched(entry.Msg, matched[0])
@@ -43,7 +43,7 @@ func findNaxsiFmt(entry *NginxErrorEntry) {
 			}
 
 			for i := 0; i < numberOfFmtItems; i++ {
-				item := NaxsiFmtItem{}
+				item := naxsiFmtItem{}
 				CScore := "cscore" + strconv.Itoa(i)
 				_, CScoreFound := query[CScore]
 				if CScoreFound {

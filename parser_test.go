@@ -28,16 +28,16 @@ func TestParser(t *testing.T) {
 		if e != nil {
 			t.Error(e)
 		}
-		json, _ := ParserJSON(ngxParser)
+		json, _ := parserJSON(ngxParser)
 		fmt.Println(string(json))
 	}
 }
 
 func TestIsJSON(t *testing.T) {
-	if IsJSON("{\"foo\" :   true}") == false {
+	if isJSON("{\"foo\" :   true}") == false {
 		t.Error("JSON must be valid")
 	}
-	if IsJSON("{\"foo\": 11,}") == true {
+	if isJSON("{\"foo\": 11,}") == true {
 		t.Error("JSON must not be valid")
 	}
 }
