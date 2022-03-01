@@ -9,9 +9,9 @@ var requestRegex = regexp.MustCompile(`request[: ]+"(?P<requestMethod>[A-Z]+) (?
 func findRequest(entry *nginxErrorEntry) {
 	if ok := requestRegex.MatchString(entry.Message); ok {
 		matched := requestRegex.FindStringSubmatch(entry.Message)
-		entry.RequestMethod = matched[1]
-		entry.RequestURI = matched[2]
-		entry.RequestHTTPVersion = matched[3]
-		entry.Msg = replaceMatched(entry.Msg, matched[0])
+		entry.RequestMethod = stringPointer(matched[1])
+		entry.RequestURI = stringPointer(matched[2])
+		entry.RequestHTTPVersion = stringPointer(matched[3])
+		entry.Msg = stringPointer(replaceMatched(*entry.Msg, matched[0]))
 	}
 }

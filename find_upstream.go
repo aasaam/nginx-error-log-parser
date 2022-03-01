@@ -10,12 +10,12 @@ var upstreamRegex = regexp.MustCompile(`upstream[: ]+"(?P<upstream>[^"]+)"`)
 func findUpstream(entry *nginxErrorEntry) {
 	if ok := upstreamRegex.MatchString(entry.Message); ok {
 		matched := upstreamRegex.FindStringSubmatch(entry.Message)
-		entry.Upstream = matched[1]
-		entry.Msg = replaceMatched(entry.Msg, matched[0])
+		entry.Upstream = stringPointer(matched[1])
+		entry.Msg = stringPointer(replaceMatched(*entry.Msg, matched[0]))
 
-		u, err := url.Parse(entry.Upstream)
+		u, err := url.Parse(matched[1])
 		if err == nil {
-			entry.UpstreamHost = u.Host
+			entry.UpstreamHost = stringPointer(u.Host)
 		}
 	}
 }

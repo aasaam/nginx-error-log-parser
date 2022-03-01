@@ -9,11 +9,11 @@ var errorOpenFailedRegex = regexp.MustCompile(`open\(\) "(?P<open>[^"]+)" failed
 func findErrorOpenFailed(entry *nginxErrorEntry) {
 	if ok := errorOpenFailedRegex.MatchString(entry.Message); ok {
 		matched := errorOpenFailedRegex.FindStringSubmatch(entry.Message)
-		entry.ErrorType = "open_failed"
-		entry.ErrorDetails = matched[1]
-		entry.Msg = replaceMatched(entry.Msg, matched[0])
+		entry.ErrorType = errorTypeOpenFailed
+		entry.ErrorDetails = stringPointer(matched[1])
+		entry.Msg = stringPointer(replaceMatched(*entry.Msg, matched[0]))
 
-		entry.checkSumParts = []string{entry.ErrorType, entry.ErrorDetails}
+		entry.checkSumParts = []string{entry.ErrorType, *entry.ErrorDetails}
 
 		entry.checkSumUseMsg = false
 	}

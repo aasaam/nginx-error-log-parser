@@ -13,23 +13,22 @@ var naxsiFmtCScoreRegex = regexp.MustCompile(`^cscore(?P<index>[0-9]+)$`)
 func findNaxsiFmt(entry *nginxErrorEntry) {
 	if ok := naxsiFMTRegex.MatchString(entry.Message); ok {
 		matched := naxsiFMTRegex.FindStringSubmatch(entry.Message)
-		entry.Msg = replaceMatched(entry.Msg, matched[0])
+		entry.Msg = stringPointer(replaceMatched(*entry.Msg, matched[0]))
 
 		query, err := url.ParseQuery(matched[1])
 
 		if err == nil {
-			entry.ErrorType = "naxsi_fmt"
-			entry.NaxsiMode = "fmt"
-			entry.NaxsiFmtIP = query.Get("ip")
-			entry.NaxsiFmtServer = query.Get("server")
-			entry.NaxsiFmtLearning = query.Get("learning") == "1"
-			entry.NaxsiFmtBlock = query.Get("block") == "1"
-			entry.NaxsiFmtVers = query.Get("vers")
-			entry.NaxsiFmtURI = query.Get("uri")
-			entry.NaxsiFmtTotalProcessed, _ = strconv.Atoi(query.Get("total_processed"))
-			entry.NaxsiFmtTotalBlocked, _ = strconv.Atoi(query.Get("total_blocked"))
+			entry.ErrorType = errorTypeNaxsiFmt
+			entry.NaxsiFmtIP = stringPointer(query.Get("ip"))
+			entry.NaxsiFmtServer = stringPointer(query.Get("server"))
+			entry.NaxsiFmtLearning = boolPointer(query.Get("learning") == "1")
+			entry.NaxsiFmtBlock = boolPointer(query.Get("block") == "1")
+			entry.NaxsiFmtVers = stringPointer(query.Get("vers"))
+			entry.NaxsiFmtURI = stringPointer(query.Get("uri"))
+			entry.NaxsiFmtTotalProcessed = intPointer(prettySureInt(query.Get("total_processed")))
+			entry.NaxsiFmtTotalBlocked = intPointer(prettySureInt(query.Get("total_blocked")))
 			entry.checkSumParts = []string{
-				"naxsi_fmt",
+				errorTypeNaxsiFmt,
 				query.Get("server"),
 				query.Get("uri"),
 				query.Get("block"),
