@@ -3,7 +3,7 @@ module github.com/aasaam/nginx-error-log-parser
 go 1.17
 
 require (
-	github.com/urfave/cli/v2 v2.5.1
+	github.com/urfave/cli/v2 v2.6.0
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 )
 
